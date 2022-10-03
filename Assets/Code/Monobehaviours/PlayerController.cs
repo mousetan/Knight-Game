@@ -1,4 +1,6 @@
+using System.Collections;
 using UnityEngine;
+
 
 [RequireComponent(typeof(CharacterController))]
 public class PlayerController : MonoBehaviour
@@ -30,6 +32,12 @@ public class PlayerController : MonoBehaviour
     private float maxPitchDown = 60f; // don't let the player look at feet
     private float cameraSensitivity = 3f;
 
+    // attacks
+    [SerializeField] private Animator SwordAnimator;
+    private bool canAttack;
+    private float attackCooldown = .417f; // AKA attack speed, lol hardcoded
+    [HideInInspector] public int attackDamage = 1;
+
     public static PlayerController Instance { get; private set; }
     private void Awake()
     {
@@ -53,7 +61,17 @@ public class PlayerController : MonoBehaviour
 
     private void ReactToAttackInput()
     {
+        if (canAttack)
+            StartCoroutine(Attack());
+    }
 
+    private IEnumerator Attack()
+    {
+        canAttack = false;
+        SwordAnimator.Play("Attack");
+        yield return new WaitForSeconds(attackCooldown);
+        SwordAnimator.Play("Idle");
+        canAttack = true;
     }
 
     private void ReactToJumpInput()
@@ -74,6 +92,7 @@ public class PlayerController : MonoBehaviour
         characterController = GetComponent<CharacterController>();
         jumpSpeedUpwards = 2f * jumpHeight / Mathf.Sqrt(2f * jumpHeight / gravity);
         state = State.Airborne;
+        canAttack = true;
     }
 
     private void OnDisable()

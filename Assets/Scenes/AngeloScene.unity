@@ -356,7 +356,7 @@ MonoBehaviour:
     ModeOverride: 0
     LensShift: {x: 0, y: 0}
     GateFit: 2
-    m_SensorSize: {x: 2.1566017, y: 1}
+    m_SensorSize: {x: 1.7777778, y: 1}
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0
@@ -728,10 +728,40 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
-    - target: {fileID: 4389270002549017229, guid: 642e71b5d7a178e43ad6daad82c4a517,
+    - target: {fileID: 2607586337007794343, guid: 642e71b5d7a178e43ad6daad82c4a517,
         type: 3}
-      propertyPath: m_Name
-      value: Eyeballs
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -34.541702
+      objectReference: {fileID: 0}
+    - target: {fileID: 2607586337007794343, guid: 642e71b5d7a178e43ad6daad82c4a517,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -1.0047293
+      objectReference: {fileID: 0}
+    - target: {fileID: 2607586337007794343, guid: 642e71b5d7a178e43ad6daad82c4a517,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: -10.265354
+      objectReference: {fileID: 0}
+    - target: {fileID: 4207845163385320070, guid: 642e71b5d7a178e43ad6daad82c4a517,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -90
+      objectReference: {fileID: 0}
+    - target: {fileID: 4207845163385320070, guid: 642e71b5d7a178e43ad6daad82c4a517,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4207845163385320070, guid: 642e71b5d7a178e43ad6daad82c4a517,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7398951583245915481, guid: 642e71b5d7a178e43ad6daad82c4a517,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 642e71b5d7a178e43ad6daad82c4a517, type: 3}
