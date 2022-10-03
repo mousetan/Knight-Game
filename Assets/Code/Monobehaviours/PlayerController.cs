@@ -22,21 +22,25 @@ public class PlayerController : MonoBehaviour
         velocity = Vector3.zero;
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
+        Debug.Log("Current State: " + state.ToString());
         velocity.y -= gravity * Time.fixedDeltaTime;
-        CheckState();
+        characterController.Move(velocity * Time.fixedDeltaTime);
+        UpdateState();
     }
 
-    private void CheckState()
+    private void UpdateState()
     {
         switch (state)
         {
             case State.Airborne:
-                Debug.Log("Player is Airborne!");
+                if (characterController.isGrounded)
+                    state = State.Grounded;
                 break;
             case State.Grounded:
-                Debug.Log("Player is Grounded!");
+                if (!characterController.isGrounded)
+                    state = State.Airborne;
                 break;
         }
     }
