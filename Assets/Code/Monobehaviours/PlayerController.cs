@@ -15,16 +15,20 @@ public class PlayerController : MonoBehaviour
 
     // physics & movement
     private Vector2 moveDirection;
-    private Vector3 velocity;
+    private Vector3 localVelocity;
+    private Vector3 worldVelocity;
     private float gravity = 9.81f;
     private float jumpHeight = 2f;
-    private float jumpSpeedUpwards;
     private float moveSpeed = 5f;
+    private float jumpSpeedUpwards;
 
     // camera
     private Vector2 lookDirection;
+    [SerializeField] private Transform eyeballs;
     private float cameraPitch;
-
+    private float maxPitchUp = 90f;
+    private float maxPitchDown = 60f; // don't let the player look at feet
+    private float cameraSensitivity = 3f;
 
     public static PlayerController Instance { get; private set; }
     private void Awake()
@@ -44,6 +48,7 @@ public class PlayerController : MonoBehaviour
         inputs.jumpInputEvent += ReactToJumpInput;
         inputs.lookInputEvent += ReactToLookInput;
         inputs.moveInputEvent += ReactToMoveInput;
+        Cursor.lockState = CursorLockMode.Locked;
     }
 
     private void ReactToAttackInput()
@@ -54,7 +59,7 @@ public class PlayerController : MonoBehaviour
     private void ReactToJumpInput()
     {
         if (state == State.Grounded)
-            velocity.y = jumpSpeedUpwards;
+            localVelocity.y = jumpSpeedUpwards;
     }
 
     private void ReactToLookInput(Vector2 lookInputDirection)
@@ -65,6 +70,7 @@ public class PlayerController : MonoBehaviour
 
     private void Start()
     {
+        eyeballs = this.transform.GetChild(0);
         characterController = GetComponent<CharacterController>();
         jumpSpeedUpwards = 2f * jumpHeight / Mathf.Sqrt(2f * jumpHeight / gravity);
         state = State.Airborne;
@@ -76,21 +82,31 @@ public class PlayerController : MonoBehaviour
         inputs.jumpInputEvent -= ReactToJumpInput;
         inputs.lookInputEvent -= ReactToLookInput;
         inputs.moveInputEvent -= ReactToMoveInput;
+        Cursor.lockState = CursorLockMode.None;
+    }
+
+    private void Update()
+    {
+        cameraPitch -= lookDirection.y * cameraSensitivity * Time.deltaTime;
+        cameraPitch = Mathf.Clamp(cameraPitch, -maxPitchUp, maxPitchDown);
+        UpdateHorizontalVelocity();
+        UpdateVerticalVelocity();
+        worldVelocity = localVelocity.x * transform.right + localVelocity.y * transform.up + localVelocity.z * transform.forward;
     }
 
     private void FixedUpdate()
     {
-        UpdateHorizontalVelocity();
-        UpdateVerticalVelocity();
-        characterController.Move(velocity * Time.fixedDeltaTime);
+        RotatePlayerAndEyeballs();
+        characterController.Move(worldVelocity * Time.deltaTime);
         UpdateState();
     }
 
-    private void UpdateCamera()
+    private void RotatePlayerAndEyeballs()
     {
-
+        eyeballs.transform.localEulerAngles = new Vector3(cameraPitch, 0f, 0f);
+        this.transform.Rotate(Vector3.up * lookDirection.x * cameraSensitivity * Time.deltaTime);
     }
-    
+
     private void UpdateHorizontalVelocity()
     {
         bool forwardMoveInputPressed = (moveDirection.y > 0);
@@ -98,21 +114,21 @@ public class PlayerController : MonoBehaviour
         bool rightMoveInputPressed = (moveDirection.x > 0);
         bool leftMoveInputPressed = (moveDirection.x < 0);
 
-        velocity.x = 0f;
-        velocity.z = 0f;
+        localVelocity.x = 0f;
+        localVelocity.z = 0f;
         if (forwardMoveInputPressed)
-            velocity.z = moveSpeed;
+            localVelocity.z = moveSpeed;
         else if (backwardMoveInputPressed)
-            velocity.z = -moveSpeed;
+            localVelocity.z = -moveSpeed;
         if (rightMoveInputPressed)
-            velocity.x = moveSpeed;
+            localVelocity.x = moveSpeed;
         else if (leftMoveInputPressed)
-            velocity.x = -moveSpeed;
+            localVelocity.x = -moveSpeed;
     }
 
     private void UpdateVerticalVelocity()
     {
-        velocity.y -= gravity * Time.fixedDeltaTime;
+        localVelocity.y -= gravity * Time.deltaTime;
     }
 
     private void UpdateState()

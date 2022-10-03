@@ -114,6 +114,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   inputs: {fileID: 11400000, guid: caff812093173a84e8b43abf5e8e89df, type: 2}
+  eyeballs: {fileID: 178425506162695320}
 --- !u!143 &283568220364550302
 CharacterController:
   m_ObjectHideFlags: 0
@@ -142,7 +143,7 @@ GameObject:
   m_Component:
   - component: {fileID: 178425506162695320}
   m_Layer: 0
-  m_Name: Eyes
+  m_Name: Eyeballs
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
