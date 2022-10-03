@@ -12,4 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 231f7bd0fde103940a80fa1260879f05, type: 3}
   m_Name: PlayerSfx
   m_EditorClassIdentifier: 
-  clips: []
+  clips:
+  - {fileID: 8300000, guid: dda06ea891b69384c994e183d709ffb7, type: 3}

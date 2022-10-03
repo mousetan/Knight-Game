@@ -34,7 +34,7 @@ public class PlayerController : MonoBehaviour
     private float cameraSensitivity = 3f;
 
     // attacks
-    [SerializeField] private Animator SwordAnimator;
+    [SerializeField] private GameObject Sword;
     private bool canAttack;
     private float attackCooldown = .417f; // AKA attack speed, lol hardcoded
     [HideInInspector] public int attackDamage = 1;
@@ -69,9 +69,10 @@ public class PlayerController : MonoBehaviour
     private IEnumerator Attack()
     {
         canAttack = false;
-        SwordAnimator.Play("Attack");
+        Sword.GetComponent<Animator>().Play("Attack");
+        Sword.GetComponent<AudioSource>().PlayOneShot(playerSfx.clips[0]);
         yield return new WaitForSeconds(attackCooldown);
-        SwordAnimator.Play("Idle");
+        Sword.GetComponent<Animator>().Play("Idle");
         canAttack = true;
     }
 
