@@ -6,6 +6,7 @@ using UnityEngine.Events;
 /// Within a script, reference an instance of this Scriptable Object as an asset in order to give
 /// that script access to the user's inputs.
 /// </summary>
+[CreateAssetMenu(menuName = "Scriptable Objects/Input Event Channel")]
 public class InputEventChannel : ScriptableObject, GameControls.IGameplayActions
 {
     public event UnityAction attackInputEvent = delegate { };
