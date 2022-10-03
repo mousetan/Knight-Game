@@ -114,6 +114,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   inputs: {fileID: 11400000, guid: caff812093173a84e8b43abf5e8e89df, type: 2}
+  playerSfx: {fileID: 11400000, guid: 074d32b5f00f2cf40a8b66243664b572, type: 2}
   eyeballs: {fileID: 178425506162695320}
   SwordAnimator: {fileID: 3918278008489103520}
   attackDamage: 1

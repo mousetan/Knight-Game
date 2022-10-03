@@ -12,6 +12,7 @@ public class PlayerController : MonoBehaviour
     }
 
     [SerializeField] private InputEventChannel inputs;
+    [SerializeField] private SfxClips playerSfx;
     private CharacterController characterController;
     private State state;
 
