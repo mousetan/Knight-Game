@@ -15,11 +15,33 @@ public class PlayerController : MonoBehaviour
     private Vector3 velocity;
     private float gravity = 9.81f;
 
+    public static PlayerController Instance { get; private set; }
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+            Destroy(gameObject);
+        else
+        {
+            DontDestroyOnLoad(gameObject);
+            Instance = this;
+        }
+    }
+
+    private void OnEnable()
+    {
+        
+    }
+
     private void Start()
     {
         characterController = GetComponent<CharacterController>();
         state = State.Airborne;
         velocity = Vector3.zero;
+    }
+
+    private void OnDisable()
+    {
+        
     }
 
     private void FixedUpdate()
