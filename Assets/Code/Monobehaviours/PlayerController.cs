@@ -146,6 +146,8 @@ public class PlayerController : MonoBehaviour
             localVelocity.x = -moveSpeed;
         else
             localVelocity.x = 0f;
+        localVelocity.z = new Vector2(localVelocity.x, localVelocity.z).normalized.y*moveSpeed;
+        localVelocity.x = new Vector2(localVelocity.x, localVelocity.z).normalized.x*moveSpeed;
     }
 
     private void UpdateVerticalVelocity()

@@ -13,7 +13,7 @@ public class EnemyController : MonoBehaviour
 
     [HideInInspector] public EnemyState state;
     private int fixedUpdateCounter = 0;
-    private int zombieGroanCount = 200; // divide by 50 to get number of seconds, min value = 150
+    private int zombieGroanCounter = 1500; 
     private int randomOffset;
     [SerializeField] private SfxClips enemySfx;
     //private Transform playerTransform;
@@ -26,7 +26,7 @@ public class EnemyController : MonoBehaviour
     {
         //playerTransform = PlayerController.Instance.transform;
         currentHealth = maxHealth;
-        randomOffset = Random.Range(0, zombieGroanCount-1);
+        randomOffset = Random.Range(0, zombieGroanCounter - 1);
         GetComponent<AudioSource>().pitch = Random.Range(0.5f, 1.2f);
     }
 
@@ -58,7 +58,7 @@ public class EnemyController : MonoBehaviour
         switch (state)
         {
             case EnemyState.Passive:
-                if (fixedUpdateCounter % (zombieGroanCount + randomOffset) == 0 && Random.Range(0f,1f) > 0f)
+                if (fixedUpdateCounter % (zombieGroanCounter + randomOffset) == 0 && Random.Range(0f, 1f) > 0f)
                     GetComponent<AudioSource>().PlayOneShot(enemySfx.clips[2]);
                 break;
             case EnemyState.Aggressive:
@@ -69,9 +69,9 @@ public class EnemyController : MonoBehaviour
 
     private void Die()
     {
+        GetComponent<AudioSource>().volume = 1f;
         GetComponent<AudioSource>().PlayOneShot(enemySfx.clips[1]);
         state = EnemyState.Dead;
-        Debug.Log("Zombie Died!");
         //transform.GetChild(1).GetComponent<SkinnedMeshRenderer>().material.color = Color.red;
         // play death animation
         // drop loot or give exp...

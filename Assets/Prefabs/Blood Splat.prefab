@@ -285,7 +285,7 @@ ParticleSystem:
     startSize:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 0.01
+      scalar: 0.015
       minScalar: 1
       maxCurve:
         serializedVersion: 2
@@ -976,9 +976,9 @@ ParticleSystem:
       time: 0
       countCurve:
         serializedVersion: 2
-        minMaxState: 0
-        scalar: 25
-        minScalar: 30
+        minMaxState: 3
+        scalar: 30
+        minScalar: 20
         maxCurve:
           serializedVersion: 2
           m_Curve:
