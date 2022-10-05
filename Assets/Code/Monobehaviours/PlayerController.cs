@@ -51,7 +51,7 @@ public class PlayerController : MonoBehaviour
     private void OnEnable()
     {
         inputs.attackInputEvent += ReactToAttackInput;
-        inputs.jumpInputEvent += ReactToJumpInput;
+        //inputs.jumpInputEvent += ReactToJumpInput;
         inputs.lookInputEvent += ReactToLookInput;
         inputs.moveInputEvent += ReactToMoveInput;
         Cursor.lockState = CursorLockMode.Locked;
@@ -97,7 +97,7 @@ public class PlayerController : MonoBehaviour
     private void OnDisable()
     {
         inputs.attackInputEvent -= ReactToAttackInput;
-        inputs.jumpInputEvent -= ReactToJumpInput;
+        //inputs.jumpInputEvent -= ReactToJumpInput;
         inputs.lookInputEvent -= ReactToLookInput;
         inputs.moveInputEvent -= ReactToMoveInput;
         Cursor.lockState = CursorLockMode.None;
