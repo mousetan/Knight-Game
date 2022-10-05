@@ -28,10 +28,10 @@ public class EnemyController : MonoBehaviour
     private void OnEnable()
     {
         //playerWeaponBehaviour = PlayerController.Instance.transform.GetChild(0).GetComponentInChildren<WeaponBehaviour>();
-        playerWeaponBehaviour.hitEvent += TakeDamage;
+        //playerWeaponBehaviour.hitEvent += TakeDamage;
     }
 
-    private void TakeDamage(int damage)
+    public void TakeDamage(int damage)
     {
         if (currentHealth > 0) 
         {
@@ -45,7 +45,7 @@ public class EnemyController : MonoBehaviour
 
     private void OnDisable()
     {
-        playerWeaponBehaviour.hitEvent -= TakeDamage;
+        //playerWeaponBehaviour.hitEvent -= TakeDamage;
     }
 
     private void Update()

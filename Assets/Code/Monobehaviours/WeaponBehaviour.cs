@@ -10,7 +10,7 @@ public class WeaponBehaviour : MonoBehaviour
     private LayerMask hurtboxLayerMask;
     private Transform playerTransform;
 
-    public event UnityAction<int> hitEvent = delegate { };
+    //public event UnityAction<int, > hitEvent = delegate { };
 
     private void Start()
     {
@@ -24,7 +24,8 @@ public class WeaponBehaviour : MonoBehaviour
         {
             Debug.DrawRay(playerTransform.position, playerTransform.forward * weaponData.range, Color.green, 1f);
             //Debug.Log("Hit: " + hitInfo.ToString());
-            hitEvent?.Invoke(weaponData.attackDamage);
+            hitInfo.transform.parent.GetComponent<EnemyController>().TakeDamage(weaponData.attackDamage);
+            //hitEvent?.Invoke(weaponData.attackDamage);
         }
         else
         {

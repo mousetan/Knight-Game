@@ -116,9 +116,7 @@ MonoBehaviour:
   inputs: {fileID: 11400000, guid: caff812093173a84e8b43abf5e8e89df, type: 2}
   playerSfx: {fileID: 11400000, guid: 074d32b5f00f2cf40a8b66243664b572, type: 2}
   eyeballs: {fileID: 178425506162695320}
-  weaponData: {fileID: 11400000, guid: efdb8fa972d1b1b46a503cb57d079818, type: 2}
   weapon: {fileID: 3543933016627554364}
-  attackDamage: 1
 --- !u!143 &283568220364550302
 CharacterController:
   m_ObjectHideFlags: 0
@@ -161,7 +159,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4389270002549017229}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.633, z: 0.534}
+  m_LocalPosition: {x: 0, y: 0.633, z: 0.2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
