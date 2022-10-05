@@ -11,7 +11,7 @@ public class EnemyController : MonoBehaviour
         Dead
     }
 
-    private EnemyState state;
+    [HideInInspector] public EnemyState state;
     private int fixedUpdateCounter = 0;
     private int zombieGroanCount = 200; // divide by 50 to get number of seconds, min value = 150
     private int randomOffset;
@@ -30,30 +30,15 @@ public class EnemyController : MonoBehaviour
         GetComponent<AudioSource>().pitch = Random.Range(0.5f, 1.2f);
     }
 
-
-    private void OnEnable()
-    {
-        //playerWeaponBehaviour = PlayerController.Instance.transform.GetChild(0).GetComponentInChildren<WeaponBehaviour>();
-        //playerWeaponBehaviour.hitEvent += TakeDamage;
-    }
-
     public void TakeDamage(int damage)
     {
         if (currentHealth > 0) 
         {
-            GetComponent<AudioSource>().PlayOneShot(enemySfx.clips[0]);
             currentHealth -= damage;
             if (currentHealth <= 0)
                 Die();
         }
     }
-
-
-    private void OnDisable()
-    {
-        //playerWeaponBehaviour.hitEvent -= TakeDamage;
-    }
-
 
     private void Update()
     {
@@ -86,6 +71,7 @@ public class EnemyController : MonoBehaviour
     {
         GetComponent<AudioSource>().PlayOneShot(enemySfx.clips[1]);
         state = EnemyState.Dead;
+        Debug.Log("Zombie Died!");
         //transform.GetChild(1).GetComponent<SkinnedMeshRenderer>().material.color = Color.red;
         // play death animation
         // drop loot or give exp...
@@ -95,5 +81,4 @@ public class EnemyController : MonoBehaviour
     //{
     // // use navmeshes instead, set goal, etc... https://docs.unity3d.com/Manual/nav-NavigationSystem.html
     //}
-
 }

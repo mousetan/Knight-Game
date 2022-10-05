@@ -216,3 +216,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weaponData: {fileID: 11400000, guid: efdb8fa972d1b1b46a503cb57d079818, type: 2}
+  swordSparks: {fileID: 311870500108558850, guid: 9d20019459825504ea222452edc4566d,
+    type: 3}
+  bloodSplat: {fileID: 311870500108558850, guid: d3f9a5e12e1231149b1e75782d6ae16f,
+    type: 3}
