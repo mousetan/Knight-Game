@@ -1,11 +1,10 @@
 using System.Collections;
 using UnityEngine;
 
-
 [RequireComponent(typeof(CharacterController))]
 public class PlayerController : MonoBehaviour
 {
-    public enum State
+    public enum PlayerState
     {
         Airborne,
         Grounded
@@ -14,7 +13,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private InputEventChannel inputs;
     [SerializeField] private SfxClips playerSfx;
     private CharacterController characterController;
-    private State state;
+    private PlayerState state;
 
     // physics & movement
     private Vector2 moveDirection;
@@ -76,7 +75,7 @@ public class PlayerController : MonoBehaviour
 
     private void ReactToJumpInput()
     {
-        if (state == State.Grounded)
+        if (state == PlayerState.Grounded)
             localVelocity.y = jumpSpeedUpwards;
     }
 
@@ -91,7 +90,7 @@ public class PlayerController : MonoBehaviour
         eyeballs = this.transform.GetChild(0);
         characterController = GetComponent<CharacterController>();
         jumpSpeedUpwards = 2f * jumpHeight / Mathf.Sqrt(2f * jumpHeight / gravity);
-        state = State.Airborne;
+        state = PlayerState.Airborne;
         canAttack = true;
     }
 
@@ -132,17 +131,19 @@ public class PlayerController : MonoBehaviour
         bool backwardMoveInputPressed = (moveDirection.y < 0);
         bool rightMoveInputPressed = (moveDirection.x > 0);
         bool leftMoveInputPressed = (moveDirection.x < 0);
-
-        localVelocity.x = 0f;
-        localVelocity.z = 0f;
+        
         if (forwardMoveInputPressed)
             localVelocity.z = moveSpeed;
         else if (backwardMoveInputPressed)
             localVelocity.z = -moveSpeed;
+        else
+            localVelocity.z = 0f;
         if (rightMoveInputPressed)
             localVelocity.x = moveSpeed;
         else if (leftMoveInputPressed)
             localVelocity.x = -moveSpeed;
+        else
+            localVelocity.x = 0f;
     }
 
     private void UpdateVerticalVelocity()
@@ -154,13 +155,13 @@ public class PlayerController : MonoBehaviour
     {
         switch (state)
         {
-            case State.Airborne:
+            case PlayerState.Airborne:
                 if (characterController.isGrounded)
-                    state = State.Grounded;
+                    state = PlayerState.Grounded;
                 break;
-            case State.Grounded:
+            case PlayerState.Grounded:
                 if (!characterController.isGrounded)
-                    state = State.Airborne;
+                    state = PlayerState.Airborne;
                 break;
         }
     }
