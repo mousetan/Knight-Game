@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.AI;
 
 [RequireComponent(typeof(CharacterController))]
 [RequireComponent(typeof(AudioSource))]
@@ -16,7 +17,9 @@ public class EnemyController : MonoBehaviour
     private int zombieGroanCounter = 1500; 
     private int randomOffset;
     [SerializeField] private SfxClips enemySfx;
-    //private Transform playerTransform;
+
+    private NavMeshAgent agent;
+    private Transform goal;
     [SerializeField] private WeaponBehaviour playerWeaponBehaviour;
 
     private int maxHealth = 10;
@@ -28,6 +31,7 @@ public class EnemyController : MonoBehaviour
         currentHealth = maxHealth;
         randomOffset = Random.Range(0, zombieGroanCounter - 1);
         GetComponent<AudioSource>().pitch = Random.Range(0.5f, 1.2f);
+        agent = GetComponent<NavMeshAgent>();
     }
 
     public void TakeDamage(int damage)
@@ -47,7 +51,6 @@ public class EnemyController : MonoBehaviour
             case EnemyState.Passive:
                 break;
             case EnemyState.Aggressive:
-                //MoveInPlayerDirectionUntilInRange();
                 break;
         }
     }
@@ -60,9 +63,10 @@ public class EnemyController : MonoBehaviour
             case EnemyState.Passive:
                 if (fixedUpdateCounter % (zombieGroanCounter + randomOffset) == 0 && Random.Range(0f, 1f) > 0f)
                     GetComponent<AudioSource>().PlayOneShot(enemySfx.clips[2]);
+                goal = PlayerController.Instance.transform;
+                agent.destination = goal.position;
                 break;
             case EnemyState.Aggressive:
-                //MoveInPlayerDirectionUntilInRange();
                 break;
         }
     }
@@ -72,13 +76,9 @@ public class EnemyController : MonoBehaviour
         GetComponent<AudioSource>().volume = 1f;
         GetComponent<AudioSource>().PlayOneShot(enemySfx.clips[1]);
         state = EnemyState.Dead;
+        GetComponent<NavMeshAgent>().enabled = false;
         //transform.GetChild(1).GetComponent<SkinnedMeshRenderer>().material.color = Color.red;
         // play death animation
         // drop loot or give exp...
     }
-
-    //private void MoveInPlayerDirectionUntilInRange()
-    //{
-    // // use navmeshes instead, set goal, etc... https://docs.unity3d.com/Manual/nav-NavigationSystem.html
-    //}
 }
