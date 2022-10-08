@@ -31,7 +31,7 @@ public class WeaponBehaviour : MonoBehaviour
         else if (Physics.Raycast(eyeTransform.position, eyeTransform.forward, out var hitInfoWall, weaponData.range))
         {
             GetComponent<AudioSource>().PlayOneShot(transform.parent.parent.GetComponent<PlayerController>().playerSfx.clips[1]);
-            Instantiate(swordSparks, hitInfoWall.point, Quaternion.identity);
+            //Instantiate(swordSparks, hitInfoWall.point, Quaternion.identity);
             Debug.DrawRay(eyeTransform.position, eyeTransform.forward * weaponData.range, Color.green, 1f);
         }
         else

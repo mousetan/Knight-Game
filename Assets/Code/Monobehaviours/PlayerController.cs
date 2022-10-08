@@ -21,8 +21,20 @@ public class PlayerController : MonoBehaviour
     private Vector3 worldVelocity;
     private float gravity = 9.81f;
     private float jumpHeight = 2f;
-    private float moveSpeed = 5f;
+    private float moveSpeedForwards = 4f;
+    private float moveSpeedSideways = 3.5f;
+    private float moveSpeedBackwards = 3f;
     private float jumpSpeedUpwards;
+
+    // footsteps
+    private AudioSource audioSource;
+    private float footstepTimer;
+    private float forwardsFootstepTimerThreshold = 0.4f;
+    private float backwardsFootstepTimerThreshold = 0.42f;
+    private float sidewaysFootstepTimerThreshold = 0.44f;
+    private int globalFootstepCounter;
+    private int footstepCounter;
+    private float firstFootstepPitch = 0.9f;
 
     // camera
     private Vector2 lookDirection;
@@ -37,7 +49,6 @@ public class PlayerController : MonoBehaviour
     private bool canAttack;
 
     // 
-
     public static PlayerController Instance { get; private set; }
     private void Awake()
     {
@@ -94,6 +105,8 @@ public class PlayerController : MonoBehaviour
         jumpSpeedUpwards = 2f * jumpHeight / Mathf.Sqrt(2f * jumpHeight / gravity);
         state = PlayerState.Airborne;
         canAttack = true;
+        audioSource = GetComponent<AudioSource>();
+        footstepCounter = 0;
     }
 
     private void OnDisable()
@@ -112,13 +125,112 @@ public class PlayerController : MonoBehaviour
         UpdateHorizontalVelocity();
         UpdateVerticalVelocity();
         worldVelocity = localVelocity.x * transform.right + localVelocity.y * transform.up + localVelocity.z * transform.forward;
+        PlayFootsteps();
     }
 
     private void FixedUpdate()
     {
         RotatePlayerAndEyeballs();
         characterController.Move(worldVelocity * Time.deltaTime);
+        //TimeFootsteps();
         UpdateState();
+    }
+
+    //private void TimeFootsteps()
+    //{
+    //    if (moveDirection.y > 0)
+    //        footstepTimer += Time.fixedDeltaTime;
+    //    else if (moveDirection.x != 0)
+    //        footstepTimer += Time.fixedDeltaTime;
+    //    else if (moveDirection.y < 0)
+    //        footstepTimer += Time.fixedDeltaTime;
+    //    else
+    //        footstepTimer = 0f;
+    //}
+
+
+    // KNOWN BUG: PLAYER CAN SPAM LEFT/RIGHT OR UP/DOWN TO MAKE TONS OF NOISE
+    private void PlayFootsteps()
+    {
+        bool playerJustStartedMoving = (footstepTimer == 0f && footstepCounter == 0);
+
+        if (moveDirection.y > 0)
+        {
+            if (playerJustStartedMoving)
+            {
+                if (globalFootstepCounter % 2 == 0)
+                    audioSource.pitch = firstFootstepPitch;
+                else
+                    audioSource.pitch = 1f;
+                audioSource.PlayOneShot(playerSfx.clips[3]);
+            }
+
+            footstepTimer += Time.deltaTime;
+            if (footstepTimer > forwardsFootstepTimerThreshold)
+            {
+                footstepTimer = 0f;
+                globalFootstepCounter++;
+                footstepCounter++;
+                if (globalFootstepCounter % 2 == 0)
+                    audioSource.pitch = firstFootstepPitch;
+                else
+                    audioSource.pitch = 1f;
+                audioSource.PlayOneShot(playerSfx.clips[3]);
+            }            
+        }
+        else if (moveDirection.x != 0)
+        {
+            if (playerJustStartedMoving)
+            {
+                if (globalFootstepCounter % 2 == 0)
+                    audioSource.pitch = firstFootstepPitch;
+                else
+                    audioSource.pitch = 1f;
+                audioSource.PlayOneShot(playerSfx.clips[3]);
+            }
+
+            footstepTimer += Time.deltaTime;
+            if (footstepTimer > sidewaysFootstepTimerThreshold)
+            {
+                footstepTimer = 0f;
+                globalFootstepCounter++;
+                footstepCounter++;
+                if (globalFootstepCounter % 2 == 0)
+                    audioSource.pitch = firstFootstepPitch;
+                else
+                    audioSource.pitch = 1f;
+                audioSource.PlayOneShot(playerSfx.clips[3]);
+            }
+        }
+        else if (moveDirection.y < 0)
+        {
+            if (playerJustStartedMoving)
+            {
+                if (globalFootstepCounter % 2 == 0)
+                    audioSource.pitch = firstFootstepPitch;
+                else
+                    audioSource.pitch = 1f;
+                audioSource.PlayOneShot(playerSfx.clips[3]);
+            }
+
+            footstepTimer += Time.deltaTime;
+            if (footstepTimer > backwardsFootstepTimerThreshold)
+            {
+                footstepTimer = 0f;
+                globalFootstepCounter++;
+                footstepCounter++;
+                if (globalFootstepCounter % 2 == 0)
+                    audioSource.pitch = firstFootstepPitch;
+                else
+                    audioSource.pitch = 1f;
+                audioSource.PlayOneShot(playerSfx.clips[3]);
+            }
+        }
+        else
+        {
+            footstepTimer = 0f;
+            footstepCounter = 0;
+        }
     }
 
     private void RotatePlayerAndEyeballs()
@@ -135,19 +247,24 @@ public class PlayerController : MonoBehaviour
         bool leftMoveInputPressed = (moveDirection.x < 0);
         
         if (forwardMoveInputPressed)
-            localVelocity.z = moveSpeed;
+            localVelocity.z = moveSpeedForwards;
         else if (backwardMoveInputPressed)
-            localVelocity.z = -moveSpeed;
+            localVelocity.z = -moveSpeedBackwards;
         else
             localVelocity.z = 0f;
         if (rightMoveInputPressed)
-            localVelocity.x = moveSpeed;
+            localVelocity.x = moveSpeedSideways;
         else if (leftMoveInputPressed)
-            localVelocity.x = -moveSpeed;
+            localVelocity.x = -moveSpeedSideways;
         else
             localVelocity.x = 0f;
-        localVelocity.z = new Vector2(localVelocity.x, localVelocity.z).normalized.y*moveSpeed;
-        localVelocity.x = new Vector2(localVelocity.x, localVelocity.z).normalized.x*moveSpeed;
+
+        if (localVelocity.z > 0)
+            localVelocity.z = new Vector2(localVelocity.x, localVelocity.z).normalized.y * moveSpeedForwards;
+        else
+            localVelocity.z = new Vector2(localVelocity.x, localVelocity.z).normalized.y * moveSpeedBackwards;
+        localVelocity.x = new Vector2(localVelocity.x, localVelocity.z).normalized.x* moveSpeedSideways;
+
     }
 
     private void UpdateVerticalVelocity()

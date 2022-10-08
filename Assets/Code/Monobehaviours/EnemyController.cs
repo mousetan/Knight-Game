@@ -27,7 +27,6 @@ public class EnemyController : MonoBehaviour
 
     private void Start()
     {
-        //playerTransform = PlayerController.Instance.transform;
         currentHealth = maxHealth;
         randomOffset = Random.Range(0, zombieGroanCounter - 1);
         GetComponent<AudioSource>().pitch = Random.Range(0.5f, 1.2f);
