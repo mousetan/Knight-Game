@@ -48,7 +48,11 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private GameObject weapon;
     private bool canAttack;
 
-    // 
+    // health
+    private float maxHealth = 100f;
+    [HideInInspector] public float currentHealth;
+    [SerializeField] private HealthBarController healthBar;
+
     public static PlayerController Instance { get; private set; }
     private void Awake()
     {
@@ -107,6 +111,9 @@ public class PlayerController : MonoBehaviour
         canAttack = true;
         audioSource = GetComponent<AudioSource>();
         footstepCounter = 0;
+        currentHealth = maxHealth;
+        healthBar.UpdateMaxHP(maxHealth);
+        healthBar.UpdateCurrentHP(currentHealth);
     }
 
     private void OnDisable()
@@ -132,31 +139,32 @@ public class PlayerController : MonoBehaviour
     {
         RotatePlayerAndEyeballs();
         characterController.Move(worldVelocity * Time.deltaTime);
-        //TimeFootsteps();
         UpdateState();
     }
 
-    //private void TimeFootsteps()
-    //{
-    //    if (moveDirection.y > 0)
-    //        footstepTimer += Time.fixedDeltaTime;
-    //    else if (moveDirection.x != 0)
-    //        footstepTimer += Time.fixedDeltaTime;
-    //    else if (moveDirection.y < 0)
-    //        footstepTimer += Time.fixedDeltaTime;
-    //    else
-    //        footstepTimer = 0f;
-    //}
+
+    private void TakeDamage(float damage)
+    {
+        currentHealth -= damage;
+        healthBar.UpdateCurrentHP(currentHealth);
+        if (currentHealth < 0f)
+            Die();
+    }
+    private void Die()
+    {
+
+    }
 
 
-    // KNOWN BUG: PLAYER CAN SPAM LEFT/RIGHT OR UP/DOWN TO MAKE TONS OF NOISE
+    // KNOWN BUG: PLAYER CAN SPAM LEFT/RIGHT OR UP/DOWN TO MAKE TONS OF NOISE, FIX IT BY TIMING THE LAST TIME SINCE THE PLAYER 
+    // LAST STOPPED MOVING
     private void PlayFootsteps()
     {
         bool playerJustStartedMoving = (footstepTimer == 0f && footstepCounter == 0);
 
         if (moveDirection.y > 0)
         {
-            if (playerJustStartedMoving)
+            if (playerJustStartedMoving) // USE A TIMER HERE TO FIX THE BUG
             {
                 if (globalFootstepCounter % 2 == 0)
                     audioSource.pitch = firstFootstepPitch;
@@ -230,6 +238,7 @@ public class PlayerController : MonoBehaviour
         {
             footstepTimer = 0f;
             footstepCounter = 0;
+            // INCREMENT A TIMER HERE TO FIX THE BUG
         }
     }
 
