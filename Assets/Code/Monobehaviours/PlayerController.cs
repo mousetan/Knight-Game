@@ -1,20 +1,21 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 [RequireComponent(typeof(CharacterController))]
 public class PlayerController : MonoBehaviour
 {
     public enum PlayerState
     {
-        Airborne,
-        Grounded
+        Alive,
+        Dead
     }
 
     [SerializeField] private InputEventChannel inputs;
     [SerializeField] public SfxClips playerSfx;
     private CharacterController characterController;
-    private PlayerState state;
+    //private PlayerState state;
 
     // physics & movement
     private Vector2 moveDirection;
@@ -37,7 +38,7 @@ public class PlayerController : MonoBehaviour
     private int footstepCounter;
     private float firstFootstepPitch = 0.9f;
     private float lastStopTimer;
-    private float lastStopTimerThreshold = 0.4f;
+    //private float lastStopTimerThreshold = 0.4f;
 
     // camera
     private Vector2 lookDirection;
@@ -54,6 +55,10 @@ public class PlayerController : MonoBehaviour
     private Stack<LootableItemData> potions = new Stack<LootableItemData>();
     private Stack<LootableItemData> grenades = new Stack<LootableItemData>();
     private Stack<LootableItemData> keys = new Stack<LootableItemData>();
+    [SerializeField] private TextMeshProUGUI potionCountText;
+    [SerializeField] private TextMeshProUGUI grenadeCountText;
+    [SerializeField] private TextMeshProUGUI keyCountText;
+
 
     // attacks
     [SerializeField] private GameObject weapon;
@@ -116,16 +121,19 @@ public class PlayerController : MonoBehaviour
             if (hitData.transform.GetComponent<Item>().itemData.name == "Potion")
             {
                 potions.Push(hitData.transform.GetComponent<Item>().itemData);
+                potionCountText.text = "x" + potions.Count.ToString("N0");
                 audioSource.PlayOneShot(hitData.transform.GetComponent<Item>().itemData.pickupSound);
             }
             else if (hitData.transform.GetComponent<Item>().itemData.name == "Grenade")
             {
                 grenades.Push(hitData.transform.GetComponent<Item>().itemData);
+                grenadeCountText.text = "x" + grenades.Count.ToString("N0");
                 audioSource.PlayOneShot(hitData.transform.GetComponent<Item>().itemData.pickupSound);
             }
             else if (hitData.transform.GetComponent<Item>().itemData.name == "Key")
             {
                 keys.Push(hitData.transform.GetComponent<Item>().itemData);
+                keyCountText.text = "x" + keys.Count.ToString("N0");
                 audioSource.PlayOneShot(hitData.transform.GetComponent<Item>().itemData.pickupSound);
             }
             Destroy(hitData.transform.gameObject);
@@ -135,7 +143,7 @@ public class PlayerController : MonoBehaviour
 
     private void ReactToJumpInput()
     {
-        if (state == PlayerState.Grounded)
+        if (characterController.isGrounded)
             localVelocity.y = jumpSpeedUpwards;
     }
 
@@ -151,7 +159,11 @@ public class PlayerController : MonoBehaviour
         {
             audioSource.PlayOneShot(potions.Peek().useSound);
             potions.Pop();
-            currentHealth += 50f;
+            potionCountText.text = "x" + potions.Count.ToString("N0");
+            if (currentHealth + 50f > maxHealth)
+                currentHealth = maxHealth;
+            else
+                currentHealth += 50f;
             healthBar.UpdateCurrentHP(currentHealth);
         }
     }
@@ -161,11 +173,11 @@ public class PlayerController : MonoBehaviour
         eyeballs = this.transform.GetChild(0);
         characterController = GetComponent<CharacterController>();
         jumpSpeedUpwards = 2f * jumpHeight / Mathf.Sqrt(2f * jumpHeight / gravity);
-        state = PlayerState.Airborne;
+        //state = PlayerState.Alive;
         canAttack = true;
         audioSource = GetComponent<AudioSource>();
         footstepCounter = 0;
-        currentHealth = 50f;
+        currentHealth = 25f;
         healthBar.UpdateMaxHP(maxHealth);
         healthBar.UpdateCurrentHP(currentHealth);
     }
@@ -196,7 +208,6 @@ public class PlayerController : MonoBehaviour
     {
         RotatePlayerAndEyeballs();
         characterController.Move(worldVelocity * Time.deltaTime);
-        UpdateState();
     }
 
 
@@ -209,7 +220,7 @@ public class PlayerController : MonoBehaviour
     }
     private void Die()
     {
-
+        //state = PlayerState.Dead;
     }
 
 
@@ -364,20 +375,5 @@ public class PlayerController : MonoBehaviour
     private void UpdateVerticalVelocity()
     {
         localVelocity.y -= gravity * Time.deltaTime;
-    }
-
-    private void UpdateState()
-    {
-        switch (state)
-        {
-            case PlayerState.Airborne:
-                if (characterController.isGrounded)
-                    state = PlayerState.Grounded;
-                break;
-            case PlayerState.Grounded:
-                if (!characterController.isGrounded)
-                    state = PlayerState.Airborne;
-                break;
-        }
     }
 }

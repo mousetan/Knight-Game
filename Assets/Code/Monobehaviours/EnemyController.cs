@@ -17,6 +17,8 @@ public class EnemyController : MonoBehaviour
     private int zombieGroanCounter = 1500; 
     private int randomOffset;
     [SerializeField] private SfxClips enemySfx;
+    public bool hasItem; 
+    [SerializeField] private GameObject droppedLoot;
 
     private NavMeshAgent agent;
     private Transform goal;
@@ -76,6 +78,11 @@ public class EnemyController : MonoBehaviour
         GetComponent<AudioSource>().PlayOneShot(enemySfx.clips[1]);
         state = EnemyState.Dead;
         GetComponent<NavMeshAgent>().enabled = false;
+        if (hasItem)
+        {
+            GetComponent<AudioSource>().PlayOneShot(enemySfx.clips[3]);
+            Instantiate(droppedLoot, transform.position + 1f * Vector3.up + 1f * transform.forward, Quaternion.Euler(-90f, 0f, 0f));
+        }
         //transform.GetChild(1).GetComponent<SkinnedMeshRenderer>().material.color = Color.red;
         // play death animation
         // drop loot or give exp...

@@ -14,3 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemName: Grenade
   itemIcon: {fileID: 2800000, guid: c2b02abd37714d14cafe3109237ba299, type: 3}
+  pickupSound: {fileID: 8300000, guid: 40544dc34d081f64abd20132323747d0, type: 3}
+  useSound: {fileID: 0}
+  prefab: {fileID: 5880308400048797094, guid: 5d6d859a595d4284b8dc66e42be1b09b, type: 3}
