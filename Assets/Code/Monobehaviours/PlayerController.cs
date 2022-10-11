@@ -40,13 +40,22 @@ public class PlayerController : MonoBehaviour
     private float lastStopTimer;
     //private float lastStopTimerThreshold = 0.4f;
 
+    // headbob
+    private float headbobVelocity;
+    private float headbobTimer = 0f;
+    //private float headbobSpeed = 10f;
+    private float headbobMagnitude = 0.1f;
+
     // camera
     private Vector2 lookDirection;
     [SerializeField] private Transform eyeballs;
+    private Vector3 defaultEyeballsPosition;
     private float cameraPitch;
     private float maxPitchUp = 90f;
     private float maxPitchDown = 70f; // don't let the player look at feet
     private float cameraSensitivity = 3f;
+
+
 
     // crosshair
     [SerializeField] private GameObject crosshair;
@@ -180,6 +189,7 @@ public class PlayerController : MonoBehaviour
         currentHealth = 25f;
         healthBar.UpdateMaxHP(maxHealth);
         healthBar.UpdateCurrentHP(currentHealth);
+        defaultEyeballsPosition = eyeballs.localPosition;
     }
 
     private void OnDisable()
@@ -199,6 +209,8 @@ public class PlayerController : MonoBehaviour
         cameraPitch = Mathf.Clamp(cameraPitch, -maxPitchUp, maxPitchDown);
         UpdateHorizontalVelocity();
         UpdateVerticalVelocity();
+        if (moveDirection != Vector2.zero)
+            CameraHeadbob();
         worldVelocity = localVelocity.x * transform.right + localVelocity.y * transform.up + localVelocity.z * transform.forward;
         PlayFootsteps();
         UpdateCrosshair();
@@ -207,6 +219,7 @@ public class PlayerController : MonoBehaviour
     private void FixedUpdate()
     {
         RotatePlayerAndEyeballs();
+        
         characterController.Move(worldVelocity * Time.deltaTime);
     }
 
@@ -247,6 +260,21 @@ public class PlayerController : MonoBehaviour
             crosshair.transform.GetChild(1).gameObject.SetActive(false);
             crosshair.transform.GetChild(2).gameObject.SetActive(false);
         }
+    }
+
+    private void CameraHeadbob()
+    {
+        //headbobVelocity += Time.fixedDeltaTime * headbobSpeed;
+        headbobTimer += Time.fixedDeltaTime;
+        if (moveDirection.y > 0f)
+            headbobVelocity = (2 * Mathf.PI / forwardsFootstepTimerThreshold) * headbobTimer;
+        else if (moveDirection.x != 0f)
+            headbobVelocity = (2 * Mathf.PI / sidewaysFootstepTimerThreshold) * headbobTimer;
+        else if (moveDirection.y < 0f)
+            headbobVelocity = (2 * Mathf.PI / backwardsFootstepTimerThreshold) * headbobTimer;
+        eyeballs.transform.localPosition = new Vector3(eyeballs.transform.localPosition.x,
+            defaultEyeballsPosition.y + Mathf.Sin(headbobVelocity) * headbobMagnitude,
+            eyeballs.transform.localPosition.z);
     }
 
 
