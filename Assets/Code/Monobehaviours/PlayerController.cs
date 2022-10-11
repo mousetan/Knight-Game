@@ -147,7 +147,13 @@ public class PlayerController : MonoBehaviour
 
     private void ReactToQuaffInput()
     {
-
+        if (potions.Count >= 1)
+        {
+            audioSource.PlayOneShot(potions.Peek().useSound);
+            potions.Pop();
+            currentHealth += 50f;
+            healthBar.UpdateCurrentHP(currentHealth);
+        }
     }
 
     private void Start()
@@ -159,7 +165,7 @@ public class PlayerController : MonoBehaviour
         canAttack = true;
         audioSource = GetComponent<AudioSource>();
         footstepCounter = 0;
-        currentHealth = maxHealth;
+        currentHealth = 50f;
         healthBar.UpdateMaxHP(maxHealth);
         healthBar.UpdateCurrentHP(currentHealth);
     }

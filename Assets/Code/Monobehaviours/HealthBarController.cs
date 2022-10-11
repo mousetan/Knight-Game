@@ -4,13 +4,13 @@ using TMPro;
 
 public class HealthBarController : MonoBehaviour
 {
-    private Slider slider;
-    private TextMeshProUGUI tmpgui;
+    [SerializeField] private Slider slider;
+    [SerializeField] private TextMeshProUGUI tmpgui;
 
     private void Start()
     {
-        slider = GetComponent<Slider>();
-        tmpgui = GetComponentInChildren<TextMeshProUGUI>();
+        //slider = GetComponent<Slider>();
+        //tmpgui = GetComponentInChildren<TextMeshProUGUI>();
     }
 
     public void UpdateMaxHP(float maxHP)

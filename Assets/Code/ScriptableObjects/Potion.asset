@@ -14,3 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemName: Potion
   itemIcon: {fileID: 2800000, guid: 7043c71065111fd459401e234935f97e, type: 3}
+  pickupSound: {fileID: 8300000, guid: 40544dc34d081f64abd20132323747d0, type: 3}
+  useSound: {fileID: 8300000, guid: 9c19124755cbefd49ac3b3feaded6588, type: 3}
+  prefab: {fileID: 5880308400048797094, guid: 3ab3a9c409c720346a8ce0cfd69f4976, type: 3}

@@ -14,3 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemName: Key
   itemIcon: {fileID: 2800000, guid: 6b53db6b9f785d3429341033561541a0, type: 3}
+  pickupSound: {fileID: 8300000, guid: 90f6c699d58018446adf3c1eac9a5867, type: 3}
+  useSound: {fileID: 0}
+  prefab: {fileID: 2678414014499604109, guid: d4fa814b6f101444895e6f7ddea0788e, type: 3}
