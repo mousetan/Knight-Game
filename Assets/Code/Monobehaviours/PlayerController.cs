@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(CharacterController))]
@@ -35,14 +36,24 @@ public class PlayerController : MonoBehaviour
     private int globalFootstepCounter;
     private int footstepCounter;
     private float firstFootstepPitch = 0.9f;
+    private float lastStopTimer;
+    private float lastStopTimerThreshold = 0.4f;
 
     // camera
     private Vector2 lookDirection;
     [SerializeField] private Transform eyeballs;
     private float cameraPitch;
     private float maxPitchUp = 90f;
-    private float maxPitchDown = 60f; // don't let the player look at feet
+    private float maxPitchDown = 70f; // don't let the player look at feet
     private float cameraSensitivity = 3f;
+
+    // crosshair
+    [SerializeField] private GameObject crosshair;
+
+    // inventory
+    private Stack<LootableItemData> potions = new Stack<LootableItemData>();
+    private Stack<LootableItemData> grenades = new Stack<LootableItemData>();
+    private Stack<LootableItemData> keys = new Stack<LootableItemData>();
 
     // attacks
     [SerializeField] private GameObject weapon;
@@ -68,9 +79,11 @@ public class PlayerController : MonoBehaviour
     private void OnEnable()
     {
         inputs.attackInputEvent += ReactToAttackInput;
+        inputs.interactInputEvent += ReactToInteractInput;
         //inputs.jumpInputEvent += ReactToJumpInput;
         inputs.lookInputEvent += ReactToLookInput;
         inputs.moveInputEvent += ReactToMoveInput;
+        inputs.quaffInputEvent += ReactToQuaffInput;
         Cursor.lockState = CursorLockMode.Locked;
     }
 
@@ -90,6 +103,36 @@ public class PlayerController : MonoBehaviour
         canAttack = true;
     }
 
+    private void ReactToInteractInput()
+    {
+        bool somethingInRange = Physics.Raycast(eyeballs.position, eyeballs.forward, out var hitData, weapon.GetComponent<WeaponBehaviour>().weaponData.range);
+        bool lootableInRange;
+        if (somethingInRange)
+            lootableInRange = (hitData.transform.gameObject.GetComponent<Item>() != null);
+        else
+            lootableInRange = false;
+        if (lootableInRange)
+        {
+            if (hitData.transform.GetComponent<Item>().itemData.name == "Potion")
+            {
+                potions.Push(hitData.transform.GetComponent<Item>().itemData);
+                audioSource.PlayOneShot(hitData.transform.GetComponent<Item>().itemData.pickupSound);
+            }
+            else if (hitData.transform.GetComponent<Item>().itemData.name == "Grenade")
+            {
+                grenades.Push(hitData.transform.GetComponent<Item>().itemData);
+                audioSource.PlayOneShot(hitData.transform.GetComponent<Item>().itemData.pickupSound);
+            }
+            else if (hitData.transform.GetComponent<Item>().itemData.name == "Key")
+            {
+                keys.Push(hitData.transform.GetComponent<Item>().itemData);
+                audioSource.PlayOneShot(hitData.transform.GetComponent<Item>().itemData.pickupSound);
+            }
+            Destroy(hitData.transform.gameObject);
+
+        }
+    }
+
     private void ReactToJumpInput()
     {
         if (state == PlayerState.Grounded)
@@ -101,6 +144,11 @@ public class PlayerController : MonoBehaviour
 
     private void ReactToMoveInput(Vector2 moveInputDirection)
         => moveDirection = moveInputDirection.normalized;
+
+    private void ReactToQuaffInput()
+    {
+
+    }
 
     private void Start()
     {
@@ -119,9 +167,11 @@ public class PlayerController : MonoBehaviour
     private void OnDisable()
     {
         inputs.attackInputEvent -= ReactToAttackInput;
+        inputs.interactInputEvent -= ReactToInteractInput;
         //inputs.jumpInputEvent -= ReactToJumpInput;
         inputs.lookInputEvent -= ReactToLookInput;
         inputs.moveInputEvent -= ReactToMoveInput;
+        inputs.interactInputEvent -= ReactToQuaffInput;
         Cursor.lockState = CursorLockMode.None;
     }
 
@@ -133,6 +183,7 @@ public class PlayerController : MonoBehaviour
         UpdateVerticalVelocity();
         worldVelocity = localVelocity.x * transform.right + localVelocity.y * transform.up + localVelocity.z * transform.forward;
         PlayFootsteps();
+        UpdateCrosshair();
     }
 
     private void FixedUpdate()
@@ -156,11 +207,38 @@ public class PlayerController : MonoBehaviour
     }
 
 
+    private void UpdateCrosshair()
+    {
+        if (Physics.Raycast(eyeballs.position, eyeballs.forward, out var hitboxInfo, weapon.GetComponent<WeaponBehaviour>().weaponData.range, 1 << 6))
+        {
+            crosshair.transform.GetChild(0).gameObject.SetActive(false);
+            crosshair.transform.GetChild(1).gameObject.SetActive(false);
+            crosshair.transform.GetChild(2).gameObject.SetActive(true);
+        }
+        else if (Physics.Raycast(eyeballs.position, eyeballs.forward, out var hitInfo, weapon.GetComponent<WeaponBehaviour>().weaponData.range))
+        {
+            if (hitInfo.transform.tag == "Item" || hitInfo.transform.tag == "Door")
+            {
+                crosshair.transform.GetChild(0).gameObject.SetActive(false);
+                crosshair.transform.GetChild(1).gameObject.SetActive(true);
+                crosshair.transform.GetChild(2).gameObject.SetActive(false);
+            }
+        }
+        else
+        {
+            crosshair.transform.GetChild(0).gameObject.SetActive(true);
+            crosshair.transform.GetChild(1).gameObject.SetActive(false);
+            crosshair.transform.GetChild(2).gameObject.SetActive(false);
+        }
+    }
+
+
     // KNOWN BUG: PLAYER CAN SPAM LEFT/RIGHT OR UP/DOWN TO MAKE TONS OF NOISE, FIX IT BY TIMING THE LAST TIME SINCE THE PLAYER 
     // LAST STOPPED MOVING
     private void PlayFootsteps()
     {
         bool playerJustStartedMoving = (footstepTimer == 0f && footstepCounter == 0);
+        //lastStopTimer += Time.deltaTime;
 
         if (moveDirection.y > 0)
         {
@@ -238,6 +316,7 @@ public class PlayerController : MonoBehaviour
         {
             footstepTimer = 0f;
             footstepCounter = 0;
+            //lastStopTimer = 0f;
             // INCREMENT A TIMER HERE TO FIX THE BUG
         }
     }

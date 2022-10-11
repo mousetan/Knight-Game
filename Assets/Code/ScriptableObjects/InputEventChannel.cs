@@ -10,9 +10,13 @@ using UnityEngine.Events;
 public class InputEventChannel : ScriptableObject, GameControls.IGameplayActions
 {
     public event UnityAction attackInputEvent = delegate { };
+    public event UnityAction interactInputEvent = delegate { };
     public event UnityAction jumpInputEvent = delegate { };
     public event UnityAction<Vector2> lookInputEvent = delegate { };
     public event UnityAction<Vector2> moveInputEvent = delegate { };
+    public event UnityAction quaffInputEvent = delegate { };
+
+
 
     private GameControls _gameControls;
 
@@ -33,6 +37,11 @@ public class InputEventChannel : ScriptableObject, GameControls.IGameplayActions
         if (context.phase == InputActionPhase.Performed)
             attackInputEvent?.Invoke();
     }
+    public void OnInteract(InputAction.CallbackContext context)
+    {
+        if (context.phase == InputActionPhase.Performed)
+            interactInputEvent?.Invoke();
+    }
 
     public void OnJump(InputAction.CallbackContext context)
     {
@@ -45,6 +54,13 @@ public class InputEventChannel : ScriptableObject, GameControls.IGameplayActions
 
     public void OnMove(InputAction.CallbackContext context)
         => moveInputEvent?.Invoke(context.ReadValue<Vector2>());
+
+    public void OnQuaff(InputAction.CallbackContext context)
+    {
+        if (context.phase == InputActionPhase.Performed)
+            quaffInputEvent?.Invoke();
+    }
+
 
     public void EnableGameplayInputs()
     {

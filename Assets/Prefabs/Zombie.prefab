@@ -2101,8 +2101,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.86848336, y: 3.0959687, z: 0.978769}
-  m_Center: {x: -0.013075609, y: 1.582847, z: 0.22622925}
+  m_Size: {x: 0.86848336, y: 3.0959687, z: 0.9529464}
+  m_Center: {x: -0.013075609, y: 1.582847, z: 0.21331796}
 --- !u!1 &8730097719686261827
 GameObject:
   m_ObjectHideFlags: 0
@@ -2120,7 +2120,7 @@ GameObject:
   - component: {fileID: 2572579917178497716}
   m_Layer: 0
   m_Name: Zombie
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

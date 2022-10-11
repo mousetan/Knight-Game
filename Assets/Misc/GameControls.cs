@@ -62,6 +62,24 @@ public partial class @GameControls : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Interact"",
+                    ""type"": ""Button"",
+                    ""id"": ""964dcb40-094d-4bbf-8ec7-5b93fa3023cc"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Quaff"",
+                    ""type"": ""Button"",
+                    ""id"": ""ec0c8496-3f1b-4cbd-8b2d-96df1df3cad3"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -152,6 +170,28 @@ public partial class @GameControls : IInputActionCollection2, IDisposable
                     ""action"": ""Look"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""fc5ed413-888b-41fe-828b-1962aff35901"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Interact"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""40961804-bdc9-4e86-b181-d589c02b73dd"",
+                    ""path"": ""<Keyboard>/q"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Quaff"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -164,6 +204,8 @@ public partial class @GameControls : IInputActionCollection2, IDisposable
         m_Gameplay_Jump = m_Gameplay.FindAction("Jump", throwIfNotFound: true);
         m_Gameplay_Attack = m_Gameplay.FindAction("Attack", throwIfNotFound: true);
         m_Gameplay_Look = m_Gameplay.FindAction("Look", throwIfNotFound: true);
+        m_Gameplay_Interact = m_Gameplay.FindAction("Interact", throwIfNotFound: true);
+        m_Gameplay_Quaff = m_Gameplay.FindAction("Quaff", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -227,6 +269,8 @@ public partial class @GameControls : IInputActionCollection2, IDisposable
     private readonly InputAction m_Gameplay_Jump;
     private readonly InputAction m_Gameplay_Attack;
     private readonly InputAction m_Gameplay_Look;
+    private readonly InputAction m_Gameplay_Interact;
+    private readonly InputAction m_Gameplay_Quaff;
     public struct GameplayActions
     {
         private @GameControls m_Wrapper;
@@ -235,6 +279,8 @@ public partial class @GameControls : IInputActionCollection2, IDisposable
         public InputAction @Jump => m_Wrapper.m_Gameplay_Jump;
         public InputAction @Attack => m_Wrapper.m_Gameplay_Attack;
         public InputAction @Look => m_Wrapper.m_Gameplay_Look;
+        public InputAction @Interact => m_Wrapper.m_Gameplay_Interact;
+        public InputAction @Quaff => m_Wrapper.m_Gameplay_Quaff;
         public InputActionMap Get() { return m_Wrapper.m_Gameplay; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -256,6 +302,12 @@ public partial class @GameControls : IInputActionCollection2, IDisposable
                 @Look.started -= m_Wrapper.m_GameplayActionsCallbackInterface.OnLook;
                 @Look.performed -= m_Wrapper.m_GameplayActionsCallbackInterface.OnLook;
                 @Look.canceled -= m_Wrapper.m_GameplayActionsCallbackInterface.OnLook;
+                @Interact.started -= m_Wrapper.m_GameplayActionsCallbackInterface.OnInteract;
+                @Interact.performed -= m_Wrapper.m_GameplayActionsCallbackInterface.OnInteract;
+                @Interact.canceled -= m_Wrapper.m_GameplayActionsCallbackInterface.OnInteract;
+                @Quaff.started -= m_Wrapper.m_GameplayActionsCallbackInterface.OnQuaff;
+                @Quaff.performed -= m_Wrapper.m_GameplayActionsCallbackInterface.OnQuaff;
+                @Quaff.canceled -= m_Wrapper.m_GameplayActionsCallbackInterface.OnQuaff;
             }
             m_Wrapper.m_GameplayActionsCallbackInterface = instance;
             if (instance != null)
@@ -272,6 +324,12 @@ public partial class @GameControls : IInputActionCollection2, IDisposable
                 @Look.started += instance.OnLook;
                 @Look.performed += instance.OnLook;
                 @Look.canceled += instance.OnLook;
+                @Interact.started += instance.OnInteract;
+                @Interact.performed += instance.OnInteract;
+                @Interact.canceled += instance.OnInteract;
+                @Quaff.started += instance.OnQuaff;
+                @Quaff.performed += instance.OnQuaff;
+                @Quaff.canceled += instance.OnQuaff;
             }
         }
     }
@@ -282,5 +340,7 @@ public partial class @GameControls : IInputActionCollection2, IDisposable
         void OnJump(InputAction.CallbackContext context);
         void OnAttack(InputAction.CallbackContext context);
         void OnLook(InputAction.CallbackContext context);
+        void OnInteract(InputAction.CallbackContext context);
+        void OnQuaff(InputAction.CallbackContext context);
     }
 }
