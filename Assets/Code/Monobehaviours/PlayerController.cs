@@ -22,7 +22,8 @@ public class PlayerController : MonoBehaviour
     private Vector3 localVelocity;
     private Vector3 worldVelocity;
     private float gravity = 9.81f;
-    private float jumpHeight = 2f;
+    private float fallGravity = 15f;
+    private float jumpHeight = 0.75f;
     private float moveSpeedForwards = 4f;
     private float moveSpeedSideways = 3.5f;
     private float moveSpeedBackwards = 3f;
@@ -39,6 +40,8 @@ public class PlayerController : MonoBehaviour
     private float firstFootstepPitch = 0.9f;
     private float lastStopTimer;
     //private float lastStopTimerThreshold = 0.4f;
+    private bool wasGrounded;
+    private bool firstLanding = true;
 
     // headbob
     private float headbobVelocity;
@@ -94,7 +97,7 @@ public class PlayerController : MonoBehaviour
     {
         inputs.attackInputEvent += ReactToAttackInput;
         inputs.interactInputEvent += ReactToInteractInput;
-        //inputs.jumpInputEvent += ReactToJumpInput;
+        inputs.jumpInputEvent += ReactToJumpInput;
         inputs.lookInputEvent += ReactToLookInput;
         inputs.moveInputEvent += ReactToMoveInput;
         inputs.quaffInputEvent += ReactToQuaffInput;
@@ -196,7 +199,7 @@ public class PlayerController : MonoBehaviour
     {
         inputs.attackInputEvent -= ReactToAttackInput;
         inputs.interactInputEvent -= ReactToInteractInput;
-        //inputs.jumpInputEvent -= ReactToJumpInput;
+        inputs.jumpInputEvent -= ReactToJumpInput;
         inputs.lookInputEvent -= ReactToLookInput;
         inputs.moveInputEvent -= ReactToMoveInput;
         inputs.interactInputEvent -= ReactToQuaffInput;
@@ -207,26 +210,82 @@ public class PlayerController : MonoBehaviour
     {
         cameraPitch -= lookDirection.y * cameraSensitivity * Time.deltaTime;
         cameraPitch = Mathf.Clamp(cameraPitch, -maxPitchUp, maxPitchDown);
-        UpdateHorizontalVelocity();
-        UpdateVerticalVelocity();
-        if (moveDirection != Vector2.zero)
-            CameraHeadbob();
-        worldVelocity = localVelocity.x * transform.right + localVelocity.y * transform.up + localVelocity.z * transform.forward;
-        PlayFootsteps();
+        //if (characterController.isGrounded)
+        //    PlayFootsteps();
         UpdateCrosshair();
     }
 
+    private float airborneTimer;
+
     private void FixedUpdate()
     {
+        UpdateHorizontalVelocity();
+        UpdateVerticalVelocity();
+        worldVelocity = localVelocity.x * transform.right + localVelocity.y * transform.up + localVelocity.z * transform.forward;
         RotatePlayerAndEyeballs();
-        
+        if (moveDirection != Vector2.zero && characterController.isGrounded)
+            CameraHeadbob();
         characterController.Move(worldVelocity * Time.deltaTime);
+        if (wasGrounded == true && !characterController.isGrounded)
+        {
+            if (characterController.velocity.y < 0f)
+                localVelocity.y = 0f - gravity * Time.fixedDeltaTime;
+            //else
+                // Play Jump Sfx
+        }
+        if (!characterController.isGrounded)
+            airborneTimer += Time.fixedDeltaTime;
+        if (wasGrounded == false && characterController.isGrounded)
+        {
+            //Debug.Log(airborneTimer);
+            //Debug.Log("Landed!");
+            if (airborneTimer <= 1f)
+            {
+                if (firstLanding)
+                    firstLanding = false;
+                else
+                    audioSource.PlayOneShot(playerSfx.clips[4]);
+            }
+            if (airborneTimer > 6.0f)
+                TakeDamage(100f, 1);
+            else if (airborneTimer > 5.0f)
+                TakeDamage(90f, 1);
+            else if (airborneTimer > 4.5f)
+                TakeDamage(80f, 1);
+            else if (airborneTimer > 4.0f)
+                TakeDamage(70f, 1);
+            else if (airborneTimer > 3.5f)
+                TakeDamage(60f, 1);
+            else if (airborneTimer > 3.0f)
+                TakeDamage(50f, 1);
+            else if (airborneTimer > 2.5f)
+                TakeDamage(40f, 1);
+            else if (airborneTimer > 2.0f)
+                TakeDamage(30f, 1);
+            else if (airborneTimer > 1.5f)
+                TakeDamage(20f, 1);
+            else if (airborneTimer > 1f)
+                TakeDamage(10f, 1);
+            airborneTimer = 0f;
+        }
+        wasGrounded = characterController.isGrounded;
+        //localVelocity.y = characterController.velocity.y;
     }
 
 
-    private void TakeDamage(float damage)
+    private void TakeDamage(float damage, int damageType)
     {
+        // damageType = 0 means hit damage from zombie
+        // damageType = 1 means fall damage
         currentHealth -= damage;
+        if (damage > 20f && damageType == 0)
+            audioSource.PlayOneShot(playerSfx.clips[5]);
+        else if (damageType == 1)
+        {
+            audioSource.PlayOneShot(playerSfx.clips[5]);
+            audioSource.PlayOneShot(playerSfx.clips[4]);
+        }
+        //audioSource.PlayOneShot(playerSfx.clips[6]);
         healthBar.UpdateCurrentHP(currentHealth);
         if (currentHealth < 0f)
             Die();
@@ -265,16 +324,36 @@ public class PlayerController : MonoBehaviour
     private void CameraHeadbob()
     {
         //headbobVelocity += Time.fixedDeltaTime * headbobSpeed;
-        headbobTimer += Time.fixedDeltaTime;
         if (moveDirection.y > 0f)
+        {
+            headbobTimer += Time.fixedDeltaTime;
             headbobVelocity = (2 * Mathf.PI / forwardsFootstepTimerThreshold) * headbobTimer;
+        }
         else if (moveDirection.x != 0f)
+        {
+            headbobTimer += Time.fixedDeltaTime;
             headbobVelocity = (2 * Mathf.PI / sidewaysFootstepTimerThreshold) * headbobTimer;
+        }
         else if (moveDirection.y < 0f)
+        {
+            headbobTimer += Time.fixedDeltaTime;
             headbobVelocity = (2 * Mathf.PI / backwardsFootstepTimerThreshold) * headbobTimer;
+        }
         eyeballs.transform.localPosition = new Vector3(eyeballs.transform.localPosition.x,
-            defaultEyeballsPosition.y + Mathf.Sin(headbobVelocity) * headbobMagnitude,
+            defaultEyeballsPosition.y + Mathf.Sin(headbobVelocity - Mathf.PI/2f) * headbobMagnitude,
             eyeballs.transform.localPosition.z);
+
+        if (Mathf.Approximately(Mathf.Sin(headbobVelocity - Mathf.PI/2f), -1f))
+        {
+            headbobTimer = 0f;
+            if (globalFootstepCounter % 2 == 0)
+                audioSource.pitch = firstFootstepPitch;
+            else
+                audioSource.pitch = 1f;
+            audioSource.PlayOneShot(playerSfx.clips[3]);
+            audioSource.pitch = 1f;
+            globalFootstepCounter++;
+        }
     }
 
 
@@ -402,6 +481,10 @@ public class PlayerController : MonoBehaviour
 
     private void UpdateVerticalVelocity()
     {
-        localVelocity.y -= gravity * Time.deltaTime;
+        if (characterController.velocity.y < 0f)
+            localVelocity.y -= fallGravity * Time.deltaTime;
+        else
+            localVelocity.y -= gravity * Time.deltaTime;
+        localVelocity.y = Mathf.Max(localVelocity.y, -15f);
     }
 }
